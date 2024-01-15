@@ -1,6 +1,6 @@
 from random import randrange
 class Game:
-    def __init__(self, on_move, state, hardcore):
+    def __init__(self, state, on_move=True, hardcore=False):
         self.on_move = on_move
         self.state = list(filter(lambda x: x > 0, state))
         self.opp = Opponent(hardcore)
@@ -30,15 +30,13 @@ class Game:
         return not self.on_move
 
     def moves(self):
-        return (lambda xss: [x for xs in xss for x in xs])([[Move(x,y+1) for y in range(self.state[x])] for x in range(len(self.state))])
+        return [Move(x,y+1) for x in range(len(self.state)) for y in range(self.state[x])]
 
-class Move:
-    def __init__(self, col, num):
-        self.col = col
-        self.num = num
+    def auto(self):
+        return self.opp.decision(self)
 
-    def __str__(self):
-        return f'take {self.num} from {self.col}'
+    def update(self):
+        self.take(self.auto())
 
 class Opponent:
     def __init__(self, hardcore):
@@ -50,3 +48,11 @@ class Opponent:
         else:
             ms = game.moves()
             return ms[randrange(len(ms))]
+
+class Move:
+    def __init__(self, col, num):
+        self.col = col
+        self.num = num
+
+    def __str__(self):
+        return f'take {self.num} from {self.col}'
