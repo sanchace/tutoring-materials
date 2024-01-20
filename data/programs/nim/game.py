@@ -1,6 +1,19 @@
 from random import randrange
+
+def play(position):
+    g = Game(position)
+    while not g.over():
+        if g.on_move:
+            print(g)
+            #a = int(input('take from: '))
+            #b = int(input('how many? '))
+            g.take(Move(int(input('take from: ')),int(input('how many? '))))
+        else:
+            g.update()
+    print(f'winner? {g.winner()}')
+
 class Game:
-    def __init__(self, state, on_move=True, hardcore=False):
+    def __init__(self, state=[randrange(20) + 1 for i in range(randrange(20))], on_move=True, hardcore=False):
         self.on_move = on_move
         self.state = list(filter(lambda x: x > 0, state))
         self.opp = Opponent(hardcore)
