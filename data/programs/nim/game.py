@@ -1,7 +1,7 @@
 from random import randrange
 
-def play(position):
-    g = Game(position)
+def play(position, hardcore=True):
+    g = Game(position, hardcore=True)
     while not g.over():
         if g.on_move:
             print(g)
@@ -15,7 +15,7 @@ def play(position):
 class Game:
     def __init__(self, state=[randrange(20) + 1 for i in range(randrange(20))], on_move=True, hardcore=False):
         self.on_move = on_move
-        self.state = list(filter(lambda x: x > 0, state))
+        self.state = [x for x in state if x > 0]
         self.opp = Opponent(hardcore)
 
     def __str__(self):
@@ -34,7 +34,7 @@ class Game:
         self.on_move = not self.on_move
         if move.col >= 0 and move.col < len(self.state):
             self.state[move.col] -= move.num
-        self.state = list(filter(lambda x: x > 0, self.state))
+        self.state = [x for x in self.state if x > 0]
     
     def over(self):
         return len(self.state) == 0
@@ -56,10 +56,11 @@ class Opponent:
         self.hardcore = hardcore
 
     def decision(self, game):
-        if self.hardcore:
-            return None
+        ms = game.moves()
+        good_moves = [x for x in ms if x.test(game.state)]
+        if self.hardcore and len(good_moves) > 0:
+            return good_moves[randrange(len(good_moves))]
         else:
-            ms = game.moves()
             return ms[randrange(len(ms))]
 
 class Move:
@@ -69,3 +70,11 @@ class Move:
 
     def __str__(self):
         return f'take {self.num} from {self.col}'
+
+    def test(self, position):
+        temp = Game(position)
+        temp.take(self)
+        count = 0
+        for n in temp.state:
+            count = count ^ n
+        return count == 0
