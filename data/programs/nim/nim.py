@@ -4,7 +4,7 @@ import game
 from math import sqrt
 from time import sleep
 
-DEBUG = True
+DEBUG = False
 
 MAX_PILES = 20
 
@@ -38,7 +38,7 @@ layout4 = [[sg.Text('Congratulations! You won!')],
 layout5 = [[sg.Text('Game Analysis (coming soon)')],
            [sg.Button('Main Menu', key='5->1')]] 
 layout6 = [[sg.Text('Game Parameters')],
-           [sg.Text(f'How many piles? (max {MAX_PILES})'), sg.Input(key='-NUM_PILES-'), sg.Button('Submit', key = '-SET_PILES-')]] +\
+           [sg.Checkbox('hardcore', key='-HARDCORE_MODE-'), sg.Text(f'How many piles? (max {MAX_PILES})'), sg.Input(key='-NUM_PILES-'), sg.Button('Submit', key = '-SET_PILES-')]] +\
            [[sg.Text(f'#dots in pile {i}', key=f'-PARAM{i}-', visible=False), sg.Input(0, key=f'-PILE{i}-', visible=False)] for i in range(MAX_PILES)] +\
            [[sg.Button('Play', key='-INIT_NEW_GAME-')]]
 layout7 = [[sg.Text('Save Game Screen')],
@@ -176,7 +176,7 @@ while True:
                 window.write_event_value('6->3', None)
                 # initialize
                 ns = [int(window[f'-PILE{i}-'].get()) for i in range(int(window['-NUM_PILES-'].get()))]
-                g = game.Game(ns)
+                g = game.Game(ns, hardcore=window['-HARDCORE_MODE-'].get())
                 # reset state
                 dots, lines = redraw(ns)
 
